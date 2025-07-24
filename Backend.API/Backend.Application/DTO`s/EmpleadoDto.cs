@@ -29,12 +29,6 @@ namespace Backend.Application.DTOs
 
         public int? TiendaId { get; set; }
 
-        [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
-        [StringLength(50, ErrorMessage = "El nombre de usuario no puede tener más de 50 caracteres.")]
-        public string Usuario { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "La clave es obligatoria.")]
-        [StringLength(100, MinimumLength = 4, ErrorMessage = "La clave debe tener entre 4 y 100 caracteres.")]
-        public string Clave { get; set; } = string.Empty;
+        public string? TiendaNombre { get; set; }
     }
 }

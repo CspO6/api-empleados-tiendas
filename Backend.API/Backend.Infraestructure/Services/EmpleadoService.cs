@@ -27,7 +27,8 @@ namespace Backend.Infrastructure.Services
                     Cargo = e.Cargo,
                     FechaIngreso = e.FechaIngreso,
                     EstaActivo = e.EstaActivo,
-                    TiendaId = e.TiendaId
+                    TiendaId = e.TiendaId,
+                    TiendaNombre = e.Tienda != null ? e.Tienda.Nombre : "Sin Tienda"
                 })
                 .ToListAsync();
         }

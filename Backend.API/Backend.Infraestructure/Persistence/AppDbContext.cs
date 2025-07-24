@@ -11,7 +11,7 @@ namespace Backend.Infrastructure.Persistence
             : base(options)
         {
         }
-
+        public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Empleado> Empleados { get; set; }
         public DbSet<Tienda> Tiendas { get; set; }
 
