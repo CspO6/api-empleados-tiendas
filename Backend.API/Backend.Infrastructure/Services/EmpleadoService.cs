@@ -1,5 +1,4 @@
 ﻿using Backend.Application.DTOs;
-using Backend.Application.Interfaces;
 using Backend.Domain.Entities;
 using Backend.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -90,12 +89,24 @@ namespace Backend.Infrastructure.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var empleado = await _context.Empleados.FindAsync(id);
+            var empleado = await _context.Empleados
+                .Include(e => e.Usuario) 
+                .FirstOrDefaultAsync(e => e.Id == id);
+
             if (empleado == null) return false;
+
+            if (empleado.Usuario != null)
+            {
+                if (empleado.Usuario.Rol == "Admin")
+                    throw new InvalidOperationException("No se puede eliminar un empleado con rol administrador.");
+
+                throw new InvalidOperationException("No se puede eliminar un empleado vinculado a un usuario.");
+            }
 
             _context.Empleados.Remove(empleado);
             await _context.SaveChangesAsync();
             return true;
         }
+
     }
 }

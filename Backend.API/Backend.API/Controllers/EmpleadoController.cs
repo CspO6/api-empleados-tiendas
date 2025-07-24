@@ -1,7 +1,6 @@
 ﻿using Backend.Application.DTOs;
-using Backend.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace Backend.API.Controllers
 {
@@ -49,10 +48,19 @@ namespace Backend.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteEmpleado(int id)
         {
-            var deleted = await _empleadoService.DeleteAsync(id);
-            return deleted ? NoContent() : NotFound();
+            try
+            {
+                var eliminado = await _empleadoService.DeleteAsync(id);
+                if (!eliminado) return NotFound();
+
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message); 
+            }
         }
     }
 }
