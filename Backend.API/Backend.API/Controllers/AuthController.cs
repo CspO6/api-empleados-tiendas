@@ -1,51 +1,27 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Backend.Domain.DTOs; 
-using Backend.Infrastructure.Settings;
+﻿using Backend.Application.DTOs;
+using Backend.Application.Interfaces;
+using Backend.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly JwtSettings _jwtSettings;
+    private readonly ILoginService _loginService;
 
-    public AuthController(IOptions<JwtSettings> jwtSettings)
+    public AuthController(ILoginService loginService)
     {
-        _jwtSettings = jwtSettings.Value;
+        _loginService = loginService;
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        
-        if (request.Usuario == "admin" && request.Clave == "1234")
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
+        var token = await _loginService.LoginAsync(request);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, request.Usuario),
-                    new Claim(ClaimTypes.Role, "Admin")
-                }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                Issuer = _jwtSettings.Issuer,
-                Audience = _jwtSettings.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
+        if (token == null)
+            return Unauthorized("Credenciales inválidas");
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
-            return Ok(new { Token = tokenString });
-        }
-
-        return Unauthorized("Credenciales inválidas");
+        return Ok(new { Token = token });
     }
 }

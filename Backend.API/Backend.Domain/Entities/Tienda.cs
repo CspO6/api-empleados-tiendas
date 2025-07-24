@@ -1,7 +1,10 @@
-﻿namespace Backend.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Backend.Domain.Entities
 {
     public class Tienda
     {
+        [Key]
         public int Id { get; set; }
         public string Nombre { get; set; } = string.Empty;
         public string Direccion { get; set; } = string.Empty;
