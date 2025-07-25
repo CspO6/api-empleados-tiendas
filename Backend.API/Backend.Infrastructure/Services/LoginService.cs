@@ -27,11 +27,15 @@ namespace Backend.Infrastructure.Services
             Console.WriteLine($"Usuario recibido: {dto.Usuario}");
             Console.WriteLine($"Clave recibida: {dto.Clave}");
 
+            // Aplicar hash a la contraseña recibida
+            var claveHasheada = HashPassword(dto.Clave.Trim());
+
+            // Buscar el usuario con el nombre y contraseña hasheada
             var usuario = await _context.Usuarios
                 .Include(u => u.Empleado)
                 .FirstOrDefaultAsync(u =>
                     u.NombreUsuario.ToLower() == dto.Usuario.ToLower().Trim() &&
-                    u.Clave == dto.Clave.Trim() &&
+                    u.Clave == claveHasheada &&
                     u.EstaActivo);
 
             if (usuario == null)
@@ -54,7 +58,6 @@ namespace Backend.Infrastructure.Services
                 new Claim(ClaimTypes.Role, usuario.Rol ?? "Empleado")
             };
 
-            // Si tiene un empleado asociado, agregar su nombre como claim adicional (opcional)
             if (usuario.Empleado != null)
             {
                 claims.Add(new Claim("EmpleadoNombre", usuario.Empleado.Nombre));
@@ -74,6 +77,7 @@ namespace Backend.Infrastructure.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
         public string HashPassword(string password)
         {
             using (var sha = System.Security.Cryptography.SHA256.Create())
@@ -84,5 +88,4 @@ namespace Backend.Infrastructure.Services
             }
         }
     }
-
 }
