@@ -6,5 +6,8 @@ namespace Backend.Application.Interfaces
     public interface ILoginService
     {
         Task<string?> LoginAsync(LoginRequestDto dto);
+        string HashPassword(string password);
+
     }
 }
+    

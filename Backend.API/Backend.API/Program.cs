@@ -1,5 +1,6 @@
 ﻿using Backend.Application.Interfaces;
 using Backend.Application.Mappings;
+using Backend.Domain.Entities;
 using Backend.Domain.Interfaces;
 using Backend.Infrastructure.Persistence;
 using Backend.Infrastructure.Repositories;
@@ -91,6 +92,47 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var loginService = scope.ServiceProvider.GetRequiredService<ILoginService>();
+
+    context.Database.EnsureCreated();
+
+    if (!context.Empleados.Any())
+    {
+        // Crear empleado inicial
+        var empleado = new Empleado
+        {
+            Nombre = "Admin",
+            Apellido = "Sistema",
+            Correo = "admin@empresa.com",
+            Cargo = "Administrador",
+            FechaIngreso = DateTime.Now,
+            EstaActivo = true,
+            TiendaId = null
+        };
+
+        context.Empleados.Add(empleado);
+        context.SaveChanges();
+
+        // Crear usuario relacionado con contraseña "123456"
+        var hash = loginService.HashPassword("123456");
+
+        var usuario = new Usuario
+        {
+            NombreUsuario = "admin",
+            Clave = hash,
+            Rol = "Administrador",
+            EstaActivo = true,
+            EmpleadoId = empleado.Id
+        };
+
+        context.Usuarios.Add(usuario);
+        context.SaveChanges();
+    }
+}
+
 app.UseCors("AllowAll");
 // Middleware
 app.UseSwagger();
