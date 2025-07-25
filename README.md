@@ -63,9 +63,11 @@ Configurar la cadena de conexión en appsettings.json:
   "DefaultConnection": "Server=localhost;Database=EmpleadosTiendasDB;Trusted_Connection=True;TrustServerCertificate=True;"
 }
 ## 3.Ejecutar el proyecto:
+```bash
 cd api-empleados-tiendas/Backend.API
 dotnet ef database update
 dotnet run
+```
 
 ## Usuario por defecto
 Si no existen usuarios, se creará automáticamente uno:
@@ -80,11 +82,12 @@ Node.js (18+)
 Angular CLI
 
 Pasos:
+```bash
 cd frontend-app/gestion-empleados
 npm install
 ng serve
 La aplicación se ejecutará en http://localhost:4200.
-
+```
 
 ## 5. Python API - Reportes en PDF
 
